@@ -12,6 +12,9 @@
         <class>jirbthagoras.jpa.core.entity.Customer</class>
         <class>jirbthagoras.jpa.core.entity.Category</class>
         <class>jirbthagoras.jpa.core.entity.Member</class>
+        <class>jirbthagoras.jpa.core.entity.Credential</class>
+        <class>jirbthagoras.jpa.core.entity.User</class>
+        <class>jirbthagoras.jpa.core.entity.Wallet</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

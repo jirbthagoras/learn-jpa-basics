@@ -3,10 +3,7 @@ package jirbthagoras.jpa.core;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import jirbthagoras.jpa.core.entity.Category;
-import jirbthagoras.jpa.core.entity.Customer;
-import jirbthagoras.jpa.core.entity.Member;
-import jirbthagoras.jpa.core.entity.Name;
+import jirbthagoras.jpa.core.entity.*;
 import jirbthagoras.jpa.core.enums.CustomerType;
 import jirbthagoras.jpa.core.utils.JpaUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -191,6 +188,69 @@ public class JPATest {
 
         TransactionProcess(() -> {
             entityManager.persist(member);
+        });
+    }
+
+    @Test
+    void testEntityListener() {
+        Category category = new Category();
+        category.setName("Contoh Entity Listener");
+
+        TransactionProcess(() -> {
+            entityManager.persist(category);
+        });
+
+        Assertions.assertNotNull(category.getUpdatedAt());
+    }
+
+    @Test
+    void testOneToOnePrimaryKey() {
+        Credential credential = new Credential();
+        credential.setId(1);
+        credential.setEmail("hansjabriel@gmail.com");
+        credential.setPassword("rahasia");
+
+        User user = new User();
+        user.setId(1);
+        user.setName("Jabriel Hans");
+
+        TransactionProcess(() -> {
+
+            entityManager.persist(user);
+            entityManager.persist(credential);
+
+        });
+    }
+
+    @Test
+    void testSaveOneToOne() {
+        TransactionProcess(() -> {
+            User user = entityManager.find(User.class, 1);
+
+            Wallet wallet = new Wallet();
+            wallet.setUser(user);
+            wallet.setBalance(100_000L);
+            entityManager.persist(wallet);
+        });
+    }
+
+    @Test
+    void testGetOneToOneRelation() {
+        TransactionProcess(() -> {
+            User user = entityManager.find(User.class, 1);
+
+            Assertions.assertNotNull(user.getWallet());
+            Assertions.assertEquals(100_000L, user.getWallet().getBalance());
+        });
+    }
+
+    @Test
+    void testGetOneToOnePrimaryKey() {
+        TransactionProcess(() -> {
+            User foundUser = entityManager.find(User.class, 1);
+
+            Assertions.assertEquals("hansjabriel@gmail.com", foundUser.getCredential().getEmail());
+            Assertions.assertEquals("rahasia", foundUser.getCredential().getPassword());
         });
     }
 
