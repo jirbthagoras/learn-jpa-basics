@@ -254,6 +254,47 @@ public class JPATest {
         });
     }
 
+    @Test
+    void testInsertOneToMany() {
+        Brand brand = new Brand();
+        brand.setId(1);
+        brand.setDescription("Brand Bagus");
+        brand.setName("Samsung");
+
+        Product product = new Product();
+        product.setId(1);
+        product.setName("Samsung Galaxy 1");
+        product.setDescription("Hewwo");
+        product.setBrand(brand);
+        product.setPrice(100_000L);
+
+        Product product1 = new Product();
+        product1.setId(2);
+        product1.setName("Samsung Galaxy 2");
+        product1.setDescription("Hewwo");
+        product1.setBrand(brand);
+        product1.setPrice(100_000L);
+
+        TransactionProcess(() -> {
+            entityManager.persist(brand);
+            entityManager.persist(product);
+            entityManager.persist(product1);
+        });
+    }
+
+    @Test
+    void testGetOneToMany() {
+        TransactionProcess(() -> {
+            Brand brand = entityManager.find(Brand.class, 1);
+
+            Assertions.assertEquals(2, brand.getProducts().size());
+
+            for(Product p : brand.getProducts()) {
+                Assertions.assertEquals("Hewwo", p.getDescription());
+            }
+        });
+    }
+
     void TransactionProcess(Runnable run) {
         EntityTransaction transaction = entityManager.getTransaction();
 
@@ -267,6 +308,7 @@ public class JPATest {
         } catch (Throwable e) {
             log.info("Transaction rollbacked {}", e.getMessage());
             transaction.rollback();
+            throw e;
         }
     }
 
